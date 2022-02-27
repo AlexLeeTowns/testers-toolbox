@@ -51,15 +51,19 @@ var loremCmd = &cobra.Command{
 	Long:  `Copy lorem ipsum text to clipboard by word count, character count, or paragraph count.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var result string
+		var e error
 
 		cmd.Flags().Visit(func(f *pflag.Flag) {
 			c, err := strconv.Atoi(f.Value.String())
 			if err != nil {
-				fmt.Print(err)
-				os.Exit(1)
+				e = err
 			}
 			result += readLorem(f.Name, c)
 		})
+
+		if e != nil {
+			return e
+		}
 
 		clipboard.WriteAll(result)
 		return nil
