@@ -2,70 +2,63 @@ package loremipsum
 
 import (
 	"bufio"
+	"errors"
+	"io"
 	"io/fs"
 	"strings"
 )
 
-func ReadLoremByCharacterCount(fs fs.FS, filename string, charcount int) (result string, err error) {
+func ReadLorem(fs fs.FS, filename, method string, charcount int) (string, error) {
 	file, err := fs.Open(filename)
 	if err != nil {
 		return "", err
 	}
 	defer file.Close()
 
-	b := make([]byte, charcount)
-	fml, err := file.Read(b)
+	var result string
+	switch method {
+	case "word":
+		words, err := scanLorem(bufio.ScanWords, charcount, file)
+		if err != nil {
+			return "", err
+		}
+		result = strings.Join(words, " ")
 
-	if err != nil {
-		return "", err
+	case "char":
+		characters, err := scanLorem(bufio.ScanBytes, charcount, file)
+		if err != nil {
+			return "", err
+		}
+		result = strings.Join(characters, "")
+
+	case "paragraph":
+		paragraphs, err := scanLorem(bufio.ScanLines, charcount, file)
+		if err != nil {
+			return "", err
+		}
+		result = strings.Join(paragraphs, "\n")
+
+	default:
+		return "", errors.New("method not allowed")
 	}
 
-	return string(b[:fml]), nil
-
+	return result, nil
 }
 
-func ReadLoremByWordCount(fs fs.FS, filename string, wordcount int) (result string, err error) {
-	file, err := fs.Open(filename)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanWords)
+func scanLorem(f bufio.SplitFunc, count int, r io.Reader) (result []string, err error) {
+	scanner := bufio.NewScanner(r)
+	scanner.Split(f)
 	var res []string
 	for scanner.Scan() {
 		res = append(res, scanner.Text())
-		if len(res) == wordcount {
+		if len(res) == count {
 			break
 		}
 	}
+
 	if err := scanner.Err(); err != nil {
-		return "", err
+		return make([]string, 0), err
 	}
 
-	return strings.Join(res, " "), nil
-}
-
-func ReadLoremByParagraph(fs fs.FS, filename string, paragraphCount int) (string, error) {
-	file, err := fs.Open(filename)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-	var res []string
-	for scanner.Scan() {
-		res = append(res, scanner.Text())
-		if len(res) == paragraphCount {
-			break
-		}
-	}
-	if err := scanner.Err(); err != nil {
-		return "", err
-	}
-
-	return strings.Join(res, "\n"), nil
+	return res, nil
 }
