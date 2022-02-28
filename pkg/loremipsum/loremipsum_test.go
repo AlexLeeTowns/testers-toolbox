@@ -1,63 +1,50 @@
 package loremipsum_test
 
 import (
+	"reflect"
 	"testing"
 	"testing/fstest"
 
 	l "github.com/AlexLeeTowns/testers-toolbox/pkg/loremipsum"
 )
 
-func TestReadLoremIpsumFile(t *testing.T) {
-	t.Run("ReadLoremByCharacterCount reads file by character", func(t *testing.T) {
-		fs := fstest.MapFS{
-			"fake-file.txt": {Data: []byte("This is a text")},
-		}
-
-		got, err := l.ReadLoremByCharacterCount(fs, "fake-file.txt", 3)
-		if err != nil {
-			t.Fatal(err)
-		}
-		want := "Thi"
-
-		if got != want {
-			t.Errorf("Got %q, want %q", got, want)
-		}
-	})
-
-	t.Run("ReadLoremByWordCount reads file by word", func(t *testing.T) {
-		fs := fstest.MapFS{
-			"fake-file.txt": {Data: []byte("These are words")},
-		}
-
-		got, err := l.ReadLoremByWordCount(fs, "fake-file.txt", 2)
-
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		want := "These are"
-
-		if got != want {
-			t.Errorf("Got %q, want %q", got, want)
-		}
-	})
-
-	t.Run("ReadLoremByWordCount reads file by paragraph", func(t *testing.T) {
-		fs := fstest.MapFS{
-			"fake-file.txt": {Data: []byte(`These are
-my final
+func TestReadLorem(t *testing.T) {
+	cases := []struct {
+		input    string
+		quantity int
+		want     string
+	}{
+		{
+			input:    "word",
+			quantity: 1,
+			want:     "These",
+		},
+		{
+			input:    "char",
+			quantity: 1,
+			want:     "T",
+		},
+		{
+			input:    "paragraph",
+			quantity: 2,
+			want: `These
+are`,
+		},
+	}
+	fs := fstest.MapFS{
+		"fake.txt": {Data: []byte(`These
+are
 words`)},
-		}
+	}
 
-		got, err := l.ReadLoremByParagraph(fs, "fake-file.txt", 2)
+	for _, tc := range cases {
+		got, err := l.ReadLorem(fs, "fake.txt", tc.input, tc.quantity)
 		if err != nil {
-			t.Fatal(err)
+			t.Errorf("Threw and error, but shouldn't: %v", err)
 		}
 
-		want := `These are
-my final`
-		if got != want {
-			t.Errorf("Got %q, want %q", got, want)
+		if !reflect.DeepEqual(got, tc.want) {
+			t.Errorf("Got %q, want %q", got, tc.want)
 		}
-	})
+	}
 }
