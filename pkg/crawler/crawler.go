@@ -3,7 +3,6 @@ package crawler
 import (
 	"fmt"
 	"net/http"
-	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -20,32 +19,8 @@ func init() {
 	Client = &http.Client{}
 }
 
-type Crawler struct {
-	crawled map[string]bool
-	mux     sync.Mutex
-}
-
 type Fetcher interface {
 	Fetch(url string) (res *Result, err error)
-}
-
-func New() *Crawler {
-	return &Crawler{
-		crawled: make(map[string]bool),
-	}
-}
-
-func (c *Crawler) visit(url string) bool {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-
-	_, ok := c.crawled[url]
-	if ok {
-		return true
-	}
-	c.crawled[url] = true
-
-	return false
 }
 
 type Result struct {
