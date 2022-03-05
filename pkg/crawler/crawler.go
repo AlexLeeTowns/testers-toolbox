@@ -74,3 +74,30 @@ func getUrlsFromResponse(res *http.Response) ([]string, error) {
 	return result, nil
 
 }
+
+func Crawl(url string, depth int, fetcher *Fetchy) {
+	if depth <= 0 {
+		return
+	}
+
+	res, err := fetcher.Fetch(url)
+	if err != nil {
+		fmt.Println("Unexpected error")
+	}
+	(*fetcher)[url] = res
+	for _, u := range res.Urls {
+		Crawl(u, depth-1, fetcher)
+	}
+}
+
+func Merge(maps ...Fetchy) Fetchy {
+	res := make(Fetchy)
+
+	for _, m := range maps {
+		for k, v := range m {
+			res[k] = v
+		}
+	}
+
+	return res
+}
