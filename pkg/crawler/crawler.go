@@ -79,6 +79,8 @@ func getUrlsFromResponse(res *http.Response) ([]string, error) {
 }
 
 func Crawl(w io.Writer, url string, depth int, fetcher *Fetchy) {
+	// TODO: Add mutex so it doesn't short out
+	// TODO: Add concurrency
 	if depth <= 0 {
 		return
 	}
