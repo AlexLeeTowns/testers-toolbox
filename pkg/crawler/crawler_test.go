@@ -2,7 +2,6 @@ package crawler_test
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"reflect"
@@ -106,8 +105,6 @@ func TestCrawl(t *testing.T) {
 
 		// Act
 		crawler.Crawl(&buf, url, 2, &f)
-		fmt.Printf((&buf).String())
-
 		// Assert
 		for key := range want {
 			if (*got)[key] == nil {
