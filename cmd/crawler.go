@@ -13,8 +13,9 @@ var crawlerCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var e error
 		f := make(crawler.Fetchy, 0)
-		// TODO: Make it actually respond to input
-		crawler.Crawl(os.Stdout, "https://ultimateqa.com/automation", 2, &f)
+		url, _ := cmd.Flags().GetString("url")
+		d, _ := cmd.Flags().GetInt("depth")
+		crawler.Crawl(os.Stdout, url, d, &f)
 
 		if e != nil {
 			return e
@@ -25,4 +26,6 @@ var crawlerCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(crawlerCmd)
+	crawlerCmd.Flags().IntP("depth", "d", 1, "Define how many recursions the page should check")
+	crawlerCmd.Flags().StringP("url", "u", "http://localhost:8080", "Define URL startingpoint to crawl")
 }
