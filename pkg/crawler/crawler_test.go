@@ -2,6 +2,7 @@ package crawler_test
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"reflect"
@@ -66,6 +67,7 @@ func TestCrawl(t *testing.T) {
 		// Arrange
 		f := crawler.Fetchy{}
 		got := &f
+		var buf bytes.Buffer
 		want := map[string]*crawler.Result{
 			url: {
 				Body: url,
@@ -74,7 +76,7 @@ func TestCrawl(t *testing.T) {
 		}
 
 		// Act
-		crawler.Crawl(url, 1, &f)
+		crawler.Crawl(&buf, url, 1, &f)
 
 		// Assert
 		if !reflect.DeepEqual((*got)[url].Urls, want[url].Urls) {
@@ -86,6 +88,7 @@ func TestCrawl(t *testing.T) {
 		// Arrange
 		f := crawler.Fetchy{}
 		got := &f
+		var buf bytes.Buffer
 		want := map[string]*crawler.Result{
 			url: {
 				Body: url,
@@ -102,7 +105,8 @@ func TestCrawl(t *testing.T) {
 		}
 
 		// Act
-		crawler.Crawl(url, 2, &f)
+		crawler.Crawl(&buf, url, 2, &f)
+		fmt.Printf((&buf).String())
 
 		// Assert
 		for key := range want {

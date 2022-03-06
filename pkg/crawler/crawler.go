@@ -2,6 +2,7 @@ package crawler
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
@@ -24,8 +25,9 @@ type Fetcher interface {
 }
 
 type Result struct {
-	Body string
-	Urls []string
+	Body       string
+	StatusCode int
+	Urls       []string
 }
 
 type Fetchy map[string]*Result
@@ -49,6 +51,7 @@ func (f Fetchy) Fetch(url string) (r *Result, err error) {
 	}
 
 	result.Urls = urls
+	result.StatusCode = res.StatusCode
 
 	return &result, nil
 }
@@ -75,7 +78,7 @@ func getUrlsFromResponse(res *http.Response) ([]string, error) {
 
 }
 
-func Crawl(url string, depth int, fetcher *Fetchy) {
+func Crawl(w io.Writer, url string, depth int, fetcher *Fetchy) {
 	if depth <= 0 {
 		return
 	}
@@ -85,8 +88,9 @@ func Crawl(url string, depth int, fetcher *Fetchy) {
 		fmt.Println("Unexpected error")
 	}
 	(*fetcher)[url] = res
+	fmt.Fprintf(w, "Url: %s; Status code: %d\n", res.Body, res.StatusCode)
 	for _, u := range res.Urls {
-		Crawl(u, depth-1, fetcher)
+		Crawl(w, u, depth-1, fetcher)
 	}
 }
 
