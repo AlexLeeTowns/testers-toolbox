@@ -13,6 +13,7 @@ var crawlerCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var e error
 		f := make(crawler.Fetchy, 0)
+		// TODO: Make it actually respond to input
 		crawler.Crawl(os.Stdout, "https://ultimateqa.com/automation", 2, &f)
 
 		if e != nil {
