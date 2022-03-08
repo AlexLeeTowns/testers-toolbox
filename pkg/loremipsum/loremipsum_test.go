@@ -1,14 +1,12 @@
 package loremipsum_test
 
 import (
-	"reflect"
 	"testing"
-	"testing/fstest"
 
 	l "github.com/AlexLeeTowns/testers-toolbox/pkg/loremipsum"
 )
 
-func TestReadLorem(t *testing.T) {
+func TestNewRead(t *testing.T) {
 	cases := []struct {
 		input    string
 		quantity int
@@ -17,33 +15,24 @@ func TestReadLorem(t *testing.T) {
 		{
 			input:    "word",
 			quantity: 1,
-			want:     "These",
+			want:     "Lorem",
 		},
 		{
 			input:    "char",
 			quantity: 1,
-			want:     "T",
+			want:     "L",
 		},
 		{
 			input:    "paragraph",
-			quantity: 2,
-			want: `These
-are`,
+			quantity: 1,
+			want:     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam rhoncus convallis turpis in sagittis. Curabitur eget iaculis elit. Vestibulum faucibus tellus non nisi dapibus, a semper turpis venenatis. Maecenas volutpat elit eu erat consectetur suscipit. Donec at nunc elementum, volutpat dui vitae, vehicula sem. Sed ac diam ac mauris aliquam sollicitudin ac nec mi. In consequat odio vitae mollis mattis.",
 		},
-	}
-	fs := fstest.MapFS{
-		"fake.txt": {Data: []byte(`These
-are
-words`)},
 	}
 
 	for _, tc := range cases {
-		got, err := l.ReadLorem(fs, "fake.txt", tc.input, tc.quantity)
-		if err != nil {
-			t.Errorf("Threw and error, but shouldn't: %v", err)
-		}
+		got := l.Read(tc.input, tc.quantity)
 
-		if !reflect.DeepEqual(got, tc.want) {
+		if got != tc.want {
 			t.Errorf("Got %q, want %q", got, tc.want)
 		}
 	}

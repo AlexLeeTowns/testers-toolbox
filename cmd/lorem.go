@@ -5,7 +5,6 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"os"
 	"strconv"
 
 	l "github.com/AlexLeeTowns/testers-toolbox/pkg/loremipsum"
@@ -29,10 +28,8 @@ var loremCmd = &cobra.Command{
 			if err != nil {
 				e = err
 			}
-			loremText, err := l.ReadLorem(os.DirFS("./pkg/loremipsum"), "lorem.txt", f.Name, c)
-			if err != nil {
-				e = err
-			}
+			loremText := l.Read(f.Name, c)
+
 			result += loremText
 		})
 
