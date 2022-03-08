@@ -8,7 +8,7 @@ import (
 //go:embed lorem.txt
 var f string
 
-func Read(method string, charcount int) string {
+func GetLorem(method string, charcount int) string {
 	var result string
 	switch method {
 	case "word":

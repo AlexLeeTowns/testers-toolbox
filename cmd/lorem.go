@@ -28,7 +28,7 @@ var loremCmd = &cobra.Command{
 			if err != nil {
 				e = err
 			}
-			loremText := l.Read(f.Name, c)
+			loremText := l.GetLorem(f.Name, c)
 
 			result += loremText
 		})

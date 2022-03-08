@@ -30,7 +30,7 @@ func TestNewRead(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		got := l.Read(tc.input, tc.quantity)
+		got := l.GetLorem(tc.input, tc.quantity)
 
 		if got != tc.want {
 			t.Errorf("Got %q, want %q", got, tc.want)
