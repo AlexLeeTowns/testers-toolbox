@@ -1,19 +1,11 @@
 package fixture
 
 import (
-	"fmt"
-
 	"github.com/AlexLeeTowns/testers-toolbox/pkg/loremipsum"
 )
 
-// TODO: Make a fixture factory
-
 type Model interface {
-	Fml()
-}
-
-type FixtureFactory interface {
-	Create(m Model) Model
+	Fill()
 }
 
 type User struct {
@@ -22,11 +14,26 @@ type User struct {
 	Country   string
 }
 
-func (u User) Fml() {
-	fmt.Print("fml")
+type Case struct {
+	User
+	Id    int
+	Title string
 }
 
-type Factory struct {
+func (c *Case) Fill() {
+	u := User{}
+	if c.User == (u) {
+		u.Fill()
+		c.User = u
+	}
+	c.Id = intIsMissing(c.Id)
+	c.Title = isMissing(c.Title)
+}
+
+func (u *User) Fill() {
+	u.FirstName = isMissing(u.FirstName)
+	u.LastName = isMissing(u.LastName)
+	u.Country = isMissing(u.Country)
 }
 
 func isMissing(param string) string {
@@ -36,11 +43,15 @@ func isMissing(param string) string {
 	return loremipsum.GetLorem("word", 2)
 }
 
-func (f *Factory) CreateUser(u User) *User {
-
-	return &User{
-		FirstName: isMissing(u.FirstName),
-		LastName:  isMissing(u.LastName),
-		Country:   isMissing(u.Country),
+func intIsMissing(param int) int {
+	if param != 0 {
+		return param
 	}
+
+	return 1
+}
+
+func Create(m Model) *Model {
+	m.Fill()
+	return &m
 }
