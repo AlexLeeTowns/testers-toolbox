@@ -1,57 +1,57 @@
 package fixture
 
 import (
-	"github.com/AlexLeeTowns/testers-toolbox/pkg/loremipsum"
+	"bytes"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
 )
 
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+var (
+	Client HTTPClient
+)
+
+func init() {
+	Client = &http.Client{}
+}
+
 type Model interface {
-	Fill()
+	path() string
+	json() ([]byte, error)
 }
+type Data struct{}
 
-type User struct {
-	FirstName string
-	LastName  string
-	Country   string
-}
-
-type Case struct {
-	User
-	Id    int
-	Title string
-}
-
-func (c *Case) Fill() {
-	u := User{}
-	if c.User == (u) {
-		u.Fill()
-		c.User = u
-	}
-	c.Id = intIsMissing(c.Id)
-	c.Title = isMissing(c.Title)
-}
-
-func (u *User) Fill() {
-	u.FirstName = isMissing(u.FirstName)
-	u.LastName = isMissing(u.LastName)
-	u.Country = isMissing(u.Country)
-}
-
-func isMissing(param string) string {
-	if param != "" {
-		return param
-	}
-	return loremipsum.GetLorem("word", 2)
-}
-
-func intIsMissing(param int) int {
-	if param != 0 {
-		return param
+func Create(m Model) ([]byte, error) {
+	body, _ := m.json()
+	path := fmt.Sprintf("%s%s", os.Getenv("BASEURL"), m.path())
+	req, err := http.NewRequest(http.MethodPost, path, bytes.NewBuffer(body))
+	if err != nil {
+		fmt.Printf("error during http request creation: %v", err)
+		return nil, err
 	}
 
-	return 1
-}
+	res, err := Client.Do(req)
+	if err != nil {
+		fmt.Printf("error during request execution: %v", err)
+		return nil, err
+	}
+	defer res.Body.Close()
 
-func Create(m Model) *Model {
-	m.Fill()
-	return &m
+	fmt.Println(res.StatusCode)
+	if res.StatusCode != 201 {
+		fmt.Printf("entity not created, response: %v", res)
+		return nil, err
+	}
+
+	data, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, err
 }
