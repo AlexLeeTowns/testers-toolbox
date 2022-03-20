@@ -1,0 +1,20 @@
+{
+    "person": {
+        "firstName": [
+            "Alex",
+            "Kimberly",
+            "Tanja"
+        ],
+        "lastName": [
+            "Smith",
+            "Jensen"
+        ]
+    },
+    "country": {
+        "code": [
+            "DK",
+            "VE",
+            "US"
+        ]
+    }
+}
