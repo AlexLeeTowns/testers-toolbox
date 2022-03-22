@@ -1,19 +1,16 @@
 package faker
 
-import (
-	"fmt"
-	"math/rand"
-	"time"
-)
-
 type Person struct {
-	FirstName []string
-	LastName  []string
+	FirstName []string `json:"firstName"`
+	LastName  []string `json:"lastName"`
 }
 
-func (p Person) GetFirstName() string {
-	rand.Seed(time.Now().Unix())
-	fname := fmt.Sprint("", p.FirstName[rand.Intn(len(p.FirstName))])
-
+func (p *Person) GetFirstName() string {
+	fname := selectString(p.FirstName)
 	return fname
+}
+
+func (p *Person) GetLastName() string {
+	lname := selectString(p.LastName)
+	return lname
 }

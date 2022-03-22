@@ -18,9 +18,8 @@ func TestPerson(t *testing.T) {
 			t.Error("expected first name to be a value")
 		}
 	})
-
 	t.Run("Should retrieve a last name", func(t *testing.T) {
-		got := f.Person.GetFirstName()
+		got := f.Person.GetLastName()
 
 		if got == "" {
 			t.Error("expected last name to have a not-empty value")
@@ -30,7 +29,7 @@ func TestPerson(t *testing.T) {
 
 func TestCountry(t *testing.T) {
 	t.Run("Should retrieve a country code", func(t *testing.T) {
-		got := f.Country.GetCountryCode()
+		got := f.Country.GetCode()
 
 		if got == "" {
 			t.Error("expected country code to not be empty")
